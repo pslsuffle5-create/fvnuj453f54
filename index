@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>injured client</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root { --accent: #9d8db3; --bg: #050505; --panel: #080808; --border: #121212; --success: #44ff44; }
+        body { background-color: #000; font-family: 'Inter', sans-serif; color: #888; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        .main-container { width: 950px; height: 700px; background: var(--bg); border: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; }
+        
+        /* Navigation */
+        .nav { height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid #1a1521; gap: 15px; position: relative; }
+        .nav-item { font-size: 11px; cursor: pointer; color: #444; transition: 0.2s; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .nav-item.active { color: var(--accent); }
+        .logo { font-style: italic; color: #666; margin-right: 20px; font-weight: 900; font-size: 14px; }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; margin-left: 20px; padding-left: 15px; border-left: 1px solid #1a1521; height: 30px; }
+        #user-name { font-size: 10px; color: #aaa; font-weight: 600; }
+
+        .btn-inject { background: transparent; border: 1px solid #1a331a; color: var(--success); padding: 5px 15px; font-size: 10px; cursor: pointer; transition: 0.2s; font-weight: bold; margin-left: auto; margin-right: 120px; text-transform: uppercase; }
+        .btn-inject:hover { background: #1a331a; border-color: var(--success); }
+
+        .status-container { position: absolute; right: 20px; display: flex; align-items: center; gap: 8px; font-size: 10px; }
+        #status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 5px #ff4444; }
+
+        .live-date { position: absolute; bottom: 15px; left: 20px; font-size: 10px; color: #444; font-weight: bold; pointer-events: none; }
+
+        /* Content Areas */
+        .content { flex: 1; display: flex; padding: 20px; gap: 20px; overflow-y: auto; }
+        .column { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .group { background: var(--panel); border: 1px solid #1a1521; padding: 18px; position: relative; }
+        .group-label { position: absolute; top: -10px; left: 10px; background: var(--bg); padding: 0 5px; font-size: 10px; color: #555; font-weight: bold; text-transform: uppercase; }
+        
+        .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-size: 11px; color: #bbb; }
+        .sub-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; font-size: 10px; }
+        .sub-row span { color: #666; text-transform: uppercase; font-weight: bold; font-size: 9px; }
+
+        .btn-key { background: #0c0c0c; border: 1px solid #222; color: var(--accent); padding: 4px 10px; font-size: 9px; cursor: pointer; min-width: 65px; text-align: center; }
+        select { background: #0c0c0c; border: 1px solid #222; color: #aaa; font-size: 10px; outline: none; padding: 3px; width: 90px; }
+        
+        input[type="checkbox"] { appearance: none; width: 34px; height: 16px; background: #0c0c0c; border: 1px solid #222; cursor: pointer; position: relative; }
+        input[type="checkbox"]:checked { background: #3d344d; border-color: var(--accent); }
+        
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 2px; background: #181818; outline: none; margin: 8px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; background: var(--accent); cursor: pointer; }
+
+        .tab-pane { display: none; width: 100%; gap: 20px; }
+        .tab-pane.active { display: flex; }
+        .val-display { color: var(--accent); font-weight: bold; float: right; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="nav">
+            <span class="logo">injured</span>
+            <div onclick="tab('aim')" id="t-aim" class="nav-item active">Aimbot</div>
+            <div onclick="tab('silent')" id="t-silent" class="nav-item">Silent</div>
+            <div onclick="tab('vis')" id="t-vis" class="nav-item">Visuals</div>
+            <div onclick="tab('misc')" id="t-misc" class="nav-item">Misc</div>
+            
+            <div class="user-profile"><span id="user-name">NOT CONNECTED</span></div>
+            <button class="btn-inject" onclick="inject()">Attach</button>
+            <div class="status-container"><div id="status-dot"></div><span id="status-text">OFFLINE</span></div>
+        </div>
+
+        <div class="content">
+            <div id="aim" class="tab-pane active">
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">Main</span>
+                        <div class="row"><span>Enable Aimbot</span><input type="checkbox" id="a_e" onchange="push()"></div>
+                        <div class="row"><span>Aimbot Key</span><button class="btn-key" id="a_key" onclick="setKey()">None</button></div>
+                        <div class="row"><span>Aiming Type</span><select id="a_type" onchange="push()"><option value="Camera">Camera</option><option value="Mouse">Mouse</option></select></div>
+                        <div class="row"><span>Target Bone</span><select id="a_bone" onchange="push()"><option value="Head">Head</option><option value="Torso">Torso</option></select></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">Aimbot Settings</span>
+                        <div class="row"><span>Sticky Aim</span><input type="checkbox" id="a_sticky" onchange="push()"></div>
+                        <div class="row"><span>Show FOV</span><input type="checkbox" id="a_sfov" onchange="push()"></div>
+                        <div class="sub-row"><span>Smoothness <span class="val-display" id="v_a_smooth">5</span></span><input type="range" id="a_smooth" min="1" max="25" step="0.5" value="5" oninput="push()"></div>
+                        <div class="sub-row"><span>Prediction <span class="val-display" id="v_a_pred">0.15</span></span><input type="range" id="a_pred" min="0" max="1" step="0.01" value="0.15" oninput="push()"></div>
+                        <div class="sub-row"><span>Max Range <span class="val-display" id="v_a_range">500</span></span><input type="range" id="a_range" min="50" max="2000" step="50" value="500" oninput="push()"></div>
+                        <div class="sub-row"><span>FOV Radius <span class="val-display" id="v_a_fov">100</span></span><input type="range" id="a_fov" min="10" max="800" value="100" oninput="push()"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="silent" class="tab-pane">
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">Main</span>
+                        <div class="row"><span>Silent Aimbot</span><input type="checkbox" id="s_e" onchange="push()"></div>
+                        <div class="row"><span>Always On</span><input type="checkbox" id="s_ao" onchange="push()"></div>
+                        <div class="row"><span>Show FOV</span><input type="checkbox" id="s_sfov" onchange="push()"></div>
+                        <div class="row"><span>Visualizer</span><input type="checkbox" id="s_vis" onchange="push()"></div>
+                    </div>
+                    <div class="group">
+                        <span class="group-label">Prediction</span>
+                        <div class="row"><span>Toggle Prediction</span><input type="checkbox" id="s_spred" onchange="push()"></div>
+                        <div class="sub-row"><span>Pred X <span class="val-display" id="v_s_px">0</span></span><input type="range" id="s_px" min="0" max="20" step="0.1" value="0" oninput="push()"></div>
+                        <div class="sub-row"><span>Pred Y <span class="val-display" id="v_s_py">0</span></span><input type="range" id="s_py" min="0" max="20" step="0.1" value="0" oninput="push()"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">Radius</span>
+                        <div class="sub-row"><span>Silent FOV <span class="val-display" id="v_s_f_ts">100</span></span><input type="range" id="s_f_ts" min="10" max="800" value="100" oninput="push()"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vis" class="tab-pane">
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">ESP Main</span>
+                        <div class="row"><span>Box ESP</span><input type="checkbox" id="v_box" onchange="push()"></div>
+                        <div class="row"><span>Corner ESP</span><input type="checkbox" id="v_cesp" onchange="push()"></div>
+                        <div class="row"><span>3D ESP</span><input type="checkbox" id="v_3d" onchange="push()"></div>
+                        <div class="row"><span>Filled Box</span><input type="checkbox" id="v_box_f" onchange="push()"></div>
+                        <div class="row"><span>Skeleton</span><input type="checkbox" id="v_skel" onchange="push()"></div>
+                        <div class="row"><span>Tracers</span><input type="checkbox" id="v_tr" onchange="push()"></div>
+                    </div>
+                    <div class="group">
+                        <span class="group-label">Overlays</span>
+                        <div class="row"><span>Name</span><input type="checkbox" id="v_name" onchange="push()"></div>
+                        <div class="row"><span>Health</span><input type="checkbox" id="v_hp" onchange="push()"></div>
+                        <div class="row"><span>Distance</span><input type="checkbox" id="v_dist" onchange="push()"></div>
+                        <div class="row"><span>China Hat</span><input type="checkbox" id="v_china" onchange="push()"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">Visual Sliders</span>
+                        <div class="sub-row"><span>Name Size <span class="val-display" id="v_v_name_s">12</span></span><input type="range" id="v_name_s" min="8" max="32" value="12" oninput="push()"></div>
+                        <div class="sub-row"><span>Dist Size <span class="val-display" id="v_v_dist_s">12</span></span><input type="range" id="v_dist_s" min="8" max="32" value="12" oninput="push()"></div>
+                        <div class="sub-row"><span>Tracer Thick <span class="val-display" id="v_v_tr_s">1</span></span><input type="range" id="v_tr_s" min="1" max="5" step="0.5" value="1" oninput="push()"></div>
+                        <div class="sub-row"><span>Head Scale <span class="val-display" id="v_v_hc_s">1</span></span><input type="range" id="v_hc_s" min="1" max="10" step="0.1" value="1" oninput="push()"></div>
+                    </div>
+                    <div class="group">
+                        <span class="group-label">World / Self</span>
+                        <div class="row"><span>Local ESP</span><input type="checkbox" id="v_local" onchange="push()"></div>
+                        <div class="row"><span>Remove Borders</span><input type="checkbox" id="v_remove_borders" onchange="push()"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="misc" class="tab-pane">
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">Humanoid</span>
+                        <div class="row"><span>Enable Walkspeed</span><input type="checkbox" id="m_ws_e" onchange="push()"></div>
+                        <div class="sub-row"><span>Speed <span class="val-display" id="v_m_ws">16</span></span><input type="range" id="m_ws" min="16" max="300" value="16" oninput="push()"></div>
+                        <div class="row"><span>Enable JumpPower</span><input type="checkbox" id="m_jp_e" onchange="push()"></div>
+                        <div class="sub-row"><span>Power <span class="val-display" id="v_m_jp">50</span></span><input type="range" id="m_jp" min="50" max="500" value="50" oninput="push()"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="group">
+                        <span class="group-label">Flight</span>
+                        <div class="row"><span>Enable Flight</span><input type="checkbox" id="m_fly_e" onchange="push()"></div>
+                        <div class="sub-row"><span>Flight Speed <span class="val-display" id="v_m_fly_s">1.5</span></span><input type="range" id="m_fly_s" min="1" max="20" step="0.5" value="1.5" oninput="push()"></div>
+                    </div>
+                    <div class="group"><span class="group-label">Network</span><div class="row"><span>DeSync</span><input type="checkbox" id="m_ds" onchange="push()"></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="live-date" id="date-display">01/01 <span style="color: var(--accent)">2026</span></div>
+    </div>
+
+    <script>
+        let currentAimbotKey = "None";
+
+        function updateDate() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            document.getElementById('date-display').innerHTML = `${day}/${month} <span style="color: var(--accent)">${year}</span>`;
+        }
+        setInterval(updateDate, 1000); updateDate();
+
+        function tab(name) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            document.getElementById('t-'+name).classList.add('active');
+        }
+
+        function setKey() {
+            const btn = document.getElementById('a_key');
+            btn.innerText = "...";
+            const handler = (e) => {
+                currentAimbotKey = e.key.toUpperCase();
+                btn.innerText = currentAimbotKey;
+                window.removeEventListener('keydown', handler);
+                push();
+            };
+            window.addEventListener('keydown', handler);
+        }
+
+        function push() {
+            const ids = ['a_fov','a_smooth','a_pred','a_range','s_px','s_py','s_f_ts','v_name_s','v_dist_s','v_tr_s','v_hc_s','m_ws','m_jp','m_fly_s'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(el && document.getElementById('v_'+id)) document.getElementById('v_'+id).innerText = el.value;
+            });
+
+            const data = {
+                a_e: document.getElementById('a_e').checked, a_key: currentAimbotKey, a_type: document.getElementById('a_type').value, a_bone: document.getElementById('a_bone').value, a_sticky: document.getElementById('a_sticky').checked, a_fov: parseFloat(document.getElementById('a_fov').value), a_smooth: parseFloat(document.getElementById('a_smooth').value), a_pred: parseFloat(document.getElementById('a_pred').value), a_range: parseInt(document.getElementById('a_range').value), a_sfov: document.getElementById('a_sfov').checked,
+                s_e: document.getElementById('s_e').checked, s_ao: document.getElementById('s_ao').checked, s_sfov: document.getElementById('s_sfov').checked, s_f_ts: parseFloat(document.getElementById('s_f_ts').value), s_px: parseFloat(document.getElementById('s_px').value), s_py: parseFloat(document.getElementById('s_py').value), s_spred: document.getElementById('s_spred').checked, s_vis: document.getElementById('s_vis').checked,
+                v_box: document.getElementById('v_box').checked, v_skel: document.getElementById('v_skel').checked, v_tr: document.getElementById('v_tr').checked, v_name: document.getElementById('v_name').checked, v_hp: document.getElementById('v_hp').checked, v_dist: document.getElementById('v_dist').checked, v_3d: document.getElementById('v_3d').checked, v_name_s: parseFloat(document.getElementById('v_name_s').value), v_dist_s: parseFloat(document.getElementById('v_dist_s').value), v_tr_s: parseFloat(document.getElementById('v_tr_s').value), v_hc_s: parseFloat(document.getElementById('v_hc_s').value), v_box_f: document.getElementById('v_box_f').checked, v_china: document.getElementById('v_china').checked, v_local: document.getElementById('v_local').checked, v_remove_borders: document.getElementById('v_remove_borders').checked, v_cesp: document.getElementById('v_cesp').checked,
+                m_ws_e: document.getElementById('m_ws_e').checked, m_ws: parseFloat(document.getElementById('m_ws').value), m_jp_e: document.getElementById('m_jp_e').checked, m_jp: parseFloat(document.getElementById('m_jp').value), m_fly_e: document.getElementById('m_fly_e').checked, m_fly_s: parseFloat(document.getElementById('m_fly_s').value), m_ds: document.getElementById('m_ds').checked
+            };
+            fetch('http://localhost:3000/', { method: 'POST', body: JSON.stringify(data) }).catch(() => {});
+        }
+
+        async function check() {
+            try {
+                const res = await fetch('http://localhost:3000/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('status-dot').style.background = '#44ff44';
+                    document.getElementById('status-dot').style.boxShadow = '0 0 5px #44ff44';
+                    document.getElementById('status-text').innerText = 'CONNECTED';
+                    if (data.connected) document.getElementById('user-name').innerText = data.username.toUpperCase();
+                }
+            } catch (e) {
+                document.getElementById('status-dot').style.background = '#ff4444';
+                document.getElementById('status-text').innerText = 'OFFLINE';
+            }
+        }
+        setInterval(check, 1500); check();
+    </script>
+</body>
+</html>
